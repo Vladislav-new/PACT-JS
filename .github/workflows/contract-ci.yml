@@ -42,7 +42,7 @@ jobs:
           PACT_BROKER_PASSWORD=${{ secrets.PACT_BROKER_PASSWORD }} \
           npm run -w provider verify:pact
           
-          # Исправленная команда - убран параметр --branch который не поддерживается
+          # Сначала создаем версию провайдера, потом добавляем тег
           npx pact-broker create-version-tag \
             --pacticipant ProductProvider \
             --version ${{ github.sha }} \
