@@ -26,6 +26,8 @@ jobs:
           node-version: 20
       - name: Install deps
         run: npm ci
+      - name: Clean existing pacts
+        run: rm -rf ./consumer/pacts/*
       - name: Wait for broker
         run: |
           for i in {1..30}; do
