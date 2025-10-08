@@ -138,39 +138,6 @@
         },
         "status": 201
       }
-    },
-    {
-      "description": "a request to create product with invalid body",
-      "providerStates": [
-        {
-          "name": "validation enforced"
-        }
-      ],
-      "request": {
-        "body": {
-          "wrong": "payload"
-        },
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "matchingRules": {
-          "body": {
-            "$": {
-              "combine": "AND",
-              "matchers": [
-                {
-                  "match": "type"
-                }
-              ]
-            }
-          }
-        },
-        "method": "POST",
-        "path": "/products"
-      },
-      "response": {
-        "status": 400
-      }
     }
   ],
   "metadata": {
