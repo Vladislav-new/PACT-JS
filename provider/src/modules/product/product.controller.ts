@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, ConflictException, Controller, Get, NotFoundException, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { IsInt, IsPositive, IsString } from 'class-validator';
 import { ProductRepository, ProductDto } from './product.repository';
 
@@ -35,7 +35,11 @@ export class ProductController {
    */
   @Post()
   create(@Body() dto: CreateProductDto): ProductDto {
-    return this.repo.create(dto);
+    try {
+      return this.repo.create(dto);
+    } catch (e) {
+      throw new ConflictException('Product already exists');
+    }
   }
 }
 

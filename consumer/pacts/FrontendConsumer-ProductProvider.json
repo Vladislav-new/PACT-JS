@@ -1,0 +1,191 @@
+{
+  "consumer": {
+    "name": "FrontendConsumer"
+  },
+  "interactions": [
+    {
+      "description": "a request for product 404",
+      "providerStates": [
+        {
+          "name": "product with id 404 does not exist"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/products/404"
+      },
+      "response": {
+        "status": 404
+      }
+    },
+    {
+      "description": "a request for product 42",
+      "providerStates": [
+        {
+          "name": "product with id 42 exists"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/products/42"
+      },
+      "response": {
+        "body": {
+          "id": 42,
+          "name": "Book"
+        },
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "a request to create existing product",
+      "providerStates": [
+        {
+          "name": "product with id 42 exists"
+        }
+      ],
+      "request": {
+        "body": {
+          "id": 42,
+          "name": "Book"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "POST",
+        "path": "/products"
+      },
+      "response": {
+        "status": 409
+      }
+    },
+    {
+      "description": "a request to create product",
+      "providerStates": [
+        {
+          "name": "can create product"
+        }
+      ],
+      "request": {
+        "body": {
+          "id": 7,
+          "name": "Pen"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "POST",
+        "path": "/products"
+      },
+      "response": {
+        "body": {
+          "id": 7,
+          "name": "Pen"
+        },
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 201
+      }
+    },
+    {
+      "description": "a request to create product with invalid body",
+      "providerStates": [
+        {
+          "name": "validation enforced"
+        }
+      ],
+      "request": {
+        "body": {
+          "wrong": "payload"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "POST",
+        "path": "/products"
+      },
+      "response": {
+        "status": 400
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "16.0.0"
+    },
+    "pactRust": {
+      "ffi": "0.4.28",
+      "models": "1.3.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "ProductProvider"
+  }
+}

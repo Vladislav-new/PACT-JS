@@ -1,7 +1,7 @@
 import { Verifier } from '@pact-foundation/pact';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../../src/module';
+import { AppModule } from '../../src/app.module';
 
 async function startApp(): Promise<{ app: INestApplication; port: number }> {
   const app = await NestFactory.create(AppModule);
@@ -22,9 +22,10 @@ async function main() {
       provider: 'ProductProvider',
       publishVerificationResult: true,
       providerVersion: process.env.GIT_SHA || 'dev',
-      enablePending: true,
-      includeWipPactsSince: undefined
-    }).verify();
+      providerVersionBranch: process.env.GITHUB_REF_NAME || 'main',
+      consumerVersionSelectors: [{ latest: true }],
+      enablePending: true
+    }).verifyProvider();
     // eslint-disable-next-line no-console
     console.log(result);
   } finally {

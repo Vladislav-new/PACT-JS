@@ -1,0 +1,16 @@
+node_modules/
+**/node_modules/
+
+dist/
+**/dist/
+
+coverage/
+**/coverage/
+
+pacts/
+**/pacts/
+
+logs/
+**/logs/
+
+broker/**

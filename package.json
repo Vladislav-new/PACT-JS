@@ -11,13 +11,22 @@
     "broker:down": "cd broker && docker compose down -v",
     "broker:logs": "cd broker && docker compose logs -f",
     "test": "npm run -ws test",
-    "build": "npm run -ws build"
+    "build": "npm run -ws build",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "engines": {
     "node": ">=18"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30"
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3"
   }
 }
 

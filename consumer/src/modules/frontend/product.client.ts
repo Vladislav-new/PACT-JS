@@ -14,8 +14,8 @@ export interface ProductDto {
 export class ProductClient {
   private readonly http: AxiosInstance;
 
-  constructor() {
-    const baseURL = process.env.PROVIDER_BASE_URL || 'http://localhost:3002';
+  constructor(baseUrlOverride?: string) {
+    const baseURL = baseUrlOverride || process.env.PROVIDER_BASE_URL || 'http://localhost:3002';
     this.http = axios.create({ baseURL });
   }
 
