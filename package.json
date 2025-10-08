@@ -1,0 +1,24 @@
+{
+  "name": "contract-nestjs-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "consumer",
+    "provider"
+  ],
+  "scripts": {
+    "broker:up": "cd broker && docker compose up -d",
+    "broker:down": "cd broker && docker compose down -v",
+    "broker:logs": "cd broker && docker compose logs -f",
+    "test": "npm run -ws test",
+    "build": "npm run -ws build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30"
+  }
+}
+
+

@@ -1,0 +1,89 @@
+name: contract-ci
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  broker:
+    runs-on: ubuntu-latest
+    services:
+      broker:
+        image: pactfoundation/pact-broker:latest
+        ports:
+          - 9292:9292
+        env:
+          PACT_BROKER_DATABASE_URL: sqlite:////tmp/pact_broker.sqlite
+          PACT_BROKER_LOG_LEVEL: INFO
+          PACT_BROKER_BASIC_AUTH_USERNAME: ${{ secrets.PACT_BROKER_USERNAME }}
+          PACT_BROKER_BASIC_AUTH_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for broker
+        run: |
+          for i in {1..30}; do
+            if curl -sf -u "${{ secrets.PACT_BROKER_USERNAME }}:${{ secrets.PACT_BROKER_PASSWORD }}" http://localhost:9292/diagnostic/status/heartbeat > /dev/null; then
+              echo "Broker is up"; exit 0; fi; sleep 2; done; exit 1
+
+  consumer:
+    needs: broker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install deps
+        working-directory: contract-nestjs/consumer
+        run: npm ci
+      - name: Run consumer pact tests
+        working-directory: contract-nestjs/consumer
+        env:
+          PROVIDER_BASE_URL: http://localhost:12345
+        run: npm run test:pact
+      - name: Publish contracts
+        working-directory: contract-nestjs/consumer
+        env:
+          PACT_BROKER_BASE_URL: http://localhost:9292
+          PACT_BROKER_USERNAME: ${{ secrets.PACT_BROKER_USERNAME }}
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: npx pact-broker publish ./pacts --consumer-app-version $GITHUB_SHA --branch $GITHUB_REF_NAME --broker-base-url $PACT_BROKER_BASE_URL --broker-username $PACT_BROKER_USERNAME --broker-password $PACT_BROKER_PASSWORD
+
+  provider:
+    needs: [broker, consumer]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install deps
+        working-directory: contract-nestjs/provider
+        run: npm ci
+      - name: Verify pacts
+        working-directory: contract-nestjs/provider
+        env:
+          PACT_BROKER_BASE_URL: http://localhost:9292
+          PACT_BROKER_USERNAME: ${{ secrets.PACT_BROKER_USERNAME }}
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+          GIT_SHA: ${{ github.sha }}
+        run: npm run verify:pact
+
+  can-i-deploy:
+    needs: [broker, consumer, provider]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Can I Deploy
+        working-directory: contract-nestjs
+        env:
+          PACT_BROKER_BASE_URL: http://localhost:9292
+          PACT_BROKER_USERNAME: ${{ secrets.PACT_BROKER_USERNAME }}
+          PACT_BROKER_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
+        run: npx pact-broker can-i-deploy --pacticipant FrontendConsumer --to ProductProvider --latest --broker-base-url $PACT_BROKER_BASE_URL --broker-username $PACT_BROKER_USERNAME --broker-password $PACT_BROKER_PASSWORD
+
+
