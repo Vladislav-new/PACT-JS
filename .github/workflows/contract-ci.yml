@@ -49,7 +49,7 @@ jobs:
           PACT_BROKER_LOG_LEVEL: INFO
           PACT_BROKER_BASIC_AUTH_USERNAME: ${{ secrets.PACT_BROKER_USERNAME }}
           PACT_BROKER_BASIC_AUTH_PASSWORD: ${{ secrets.PACT_BROKER_PASSWORD }}
-      options: --network host
+        options: --network host
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
